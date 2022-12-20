@@ -2,7 +2,7 @@ class User < ApplicationRecord
     validates :username, :session_token, presence: true, uniqueness: true
     validates :password_digest, presence: { message: 'Password can\'t be blank'} # null 일 경우 error
     validates :password, length: { minimum: 6, allow_nil: true } # password length 6 이하면 error, nil 이어도 error x
-    before_validation :ensure_session_token # validation 하기 전에 ensure_ ~ 실행됨
+    before_validation :ensure_session_token # validation 하기 전에 ensure_ ~ 실행됨 helper method
 
     attr_reader :password
 
@@ -12,6 +12,7 @@ class User < ApplicationRecord
         # `user && user.is_password?(password)`
         user&.is_password?(password) ? user : nil
         # user 를 찾고, password가 맞으면 user, 아니면 nil
+
       end
 
     def password=(password)
@@ -21,8 +22,9 @@ class User < ApplicationRecord
     end
 
     def is_password?(password)
-        BCrypt::Password.new(password_digest).is_password?(password)
+        BCrypt::Password.new(password_digest).is_password?(password) # 여기 .is_password?는 helper method, especially BCrypt.
         # 들어온 password와 저장된 password가 같은지 확인 맞으면 true / 틀리면 false
+        # password_digest == self.pasword_digest ???
     end
 
     def reset_session_token!
